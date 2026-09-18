@@ -6,11 +6,15 @@ import {
   QueryList,
   ViewChild,
   ViewChildren,
+  Input,
+  signal
 } from '@angular/core';
 import { gsap } from "gsap";
+import { ImageSliderBox } from './image-slider-box/image-slider-box';
+import { ImageSliderTrailItem } from './image-slider-trail-item/image-slider-trail-item';
 
 @Component({
-  imports: [],
+  imports: [ImageSliderBox, ImageSliderTrailItem],
   selector: 'app-image-slider',
   styleUrl: './image-slider.scss',
   templateUrl: './image-slider.html',
@@ -18,13 +22,11 @@ import { gsap } from "gsap";
 export class ImageSlider {
   @ViewChild('slider') slider!: ElementRef;
   @ViewChildren('trailItem') trail!: QueryList<ElementRef>;
+
   constructor(@Inject(DOCUMENT) private document: Document) {}
 
   public ngAfterViewInit() {
     // Add function to all trails
-    this.trail.forEach((el) =>
-      el.nativeElement.addEventListener('click', (ev: any) => this.clickCheck(ev)),
-    );
     this.document.querySelectorAll('svg').forEach((cur) => {
       // Assign function based on the class Name("next" and "prev")
       cur.addEventListener('click', () =>
@@ -33,53 +35,70 @@ export class ImageSlider {
     });
   }
 
+  @Input() boxes!: ImageSliderBox[];
   // Transform value
   public value: number = 0;
-  // trail index number
-  public trailValue: number = 0;
+
   // interval (Duration)
   public interval: number = 4000;
+  public activeBoxId = signal(1);
+  protected start = setInterval(() => this.slide('increase'), this.interval);
+
+  protected updateActiveBox(activeBoxId: number) {
+    let newBoxId;
+    if (activeBoxId > this.boxes.length){
+      newBoxId = 1
+    }
+    else if (activeBoxId <= 0){
+        newBoxId = this.boxes.length;
+    }
+    else {
+        newBoxId = activeBoxId;
+    }
+    this.activeBoxId.set(newBoxId);
+
+    clearInterval(this.start);
+    // Get selected trail
+
+    this.value = this.computeTransformationIndex()
+    // transfrom slide
+    this.move(this.value);
+    // start animation
+    this.animate();
+    // start interval
+    this.start = setInterval(() => this.slide('increase'), this.interval);
+  }
 
   // Function to slide forward
   protected slide = (condition: string): void => {
-    // CLear interval
-    clearInterval(this.start);
     // update value and trailValue
     condition === 'increase' ? this.initiateINC() : this.initiateDEC();
-    // move slide
-    this.move(this.value, this.trailValue);
     // Restart Animation
     this.animate();
     // start interal for slides back
-    this.start = setInterval(() => this.slide('increase'), this.interval);
   };
 
   // function for increase(forward, next) configuration
   protected initiateINC = (): void => {
-    // Remove active from all trails
-    this.trail.forEach((cur) => cur.nativeElement.classList.remove('active'));
-    // increase transform value
-    this.value === 80 ? (this.value = 0) : (this.value += 20);
-    // update trailValue based on value
-    this.trailUpdate();
+    let newBoxId = this.activeBoxId() + 1;
+    this.updateActiveBox(newBoxId);
   };
 
   // function for decrease(backward, previous) configuration
   protected initiateDEC = (): void => {
-    // Remove active from all trails
-    this.trail.forEach((cur) => cur.nativeElement.classList.remove('active'));
-    // decrease transform value
-    this.value === 0 ? (this.value = 80) : (this.value -= 20);
-    // update trailValue based on value
-    this.trailUpdate();
+    let newBoxId = this.activeBoxId() - 1;
+    this.updateActiveBox(newBoxId);
   };
 
+  protected computeTransformationIndex(){
+    const index = this.activeBoxId() - 1;
+    return index * 100;
+  }
+
   // function to transform slide
-  protected move = (S: number, T: number): void => {
+  protected move = (S: number): void => {
     // transform slider
     this.slider.nativeElement.style.transform = `translateX(-${S}%)`;
-    //add active class to the current trail
-    this.trail.get(T)!.nativeElement.classList.add('active');
   };
 
   protected tl = gsap
@@ -91,57 +110,6 @@ export class ImageSlider {
 
   // function to restart animation
   protected animate = () => this.tl.restart();
-
-  // function to update trailValue based on slide value
-  protected trailUpdate = () => {
-    if (this.value === 0) {
-      this.trailValue = 0;
-    } else if (this.value === 20) {
-      this.trailValue = 1;
-    } else if (this.value === 40) {
-      this.trailValue = 2;
-    } else if (this.value === 60) {
-      this.trailValue = 3;
-    } else {
-      this.trailValue = 4;
-    }
-  };
-
-  // Start interval for slides
-  protected start = setInterval(() => this.slide('increase'), this.interval);
-
-  // function to slide when trail is clicked
-  protected clickCheck = (e: any) => {
-    // CLear interval
-    clearInterval(this.start);
-    // remove active class from all trails
-    this.trail.forEach((cur) => cur.nativeElement.classList.remove('active'));
-    // Get selected trail
-    const check = e.target;
-    // add active class
-    check.classList.add('active');
-
-    // Update slide value based on the selected trail
-    if (check.classList.contains('box1')) {
-      this.value = 0;
-    } else if (check.classList.contains('box2')) {
-      this.value = 20;
-    } else if (check.classList.contains('box3')) {
-      this.value = 40;
-    } else if (check.classList.contains('box4')) {
-      this.value = 60;
-    } else {
-      this.value = 80;
-    }
-    // update trail based on value
-    this.trailUpdate();
-    // transfrom slide
-    this.move(this.value, this.trailValue);
-    // start animation
-    this.animate();
-    // start interval
-    this.start = setInterval(() => this.slide('increase'), this.interval);
-  };
 
   // Mobile touch Slide Section
   protected touchSlide = () => {
@@ -179,4 +147,5 @@ export class ImageSlider {
     // call mobile on touch end
     this.slider.nativeElement.addEventListener('touchend', mobile);
   };
+
 }

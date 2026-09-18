@@ -1,0 +1,12 @@
+<div [ngClass]="['box', 'box' + boxId]">
+  <div class="bg"></div>
+  <div class="details">
+    <h1>{{ this.header }}</h1>
+    <p>
+      {{this.description}}
+    </p>
+    <button>{{ this.buttonText }}</button>
+  </div>
+
+  <div class="illustration"><div class="inner"></div></div>
+</div>

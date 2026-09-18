@@ -1,0 +1,241 @@
+@use "sass:map";
+@use "sass:list";
+// Colors
+$b1cd: #500033;
+$b1cl: #FF0077;
+$b2cd: #000050;
+$b2cl: #0033FF;
+$b3cd: #00501D;
+$b3cl: #00FF44;
+$b4cd: #554D00;
+$b4cl: #FF4E00;
+$b5cd: #300050;
+$b5cl: #8000FF;
+$black: #000;
+$white: #fff;
+$grey: #B5B4B4;
+
+////////// Mixin
+
+// Generate different colors for slides
+@mixin color_render($DC, $LC) {
+  background-color: $DC;
+  .illustration .inner {
+    background-color: $LC;
+    &::after, &::before{ background-color: rgba($LC, .4);}
+  }
+  button {background-color: $LC;}
+}
+
+*,
+*:before,
+*:after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+
+:host {
+  width: 100%;
+  flex-shrink: 0;
+  display: block;
+}
+.container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 5rem;
+
+  @media only screen and (max-width: 1000px) {
+    border-radius: 0;
+  }
+}
+
+$dark-colors: (
+  1: #500033,
+  2: #000050,
+  3: #00501D,
+  4: #554D00,
+  5: #300050
+);
+
+$light-colors: (
+  1: #FF0077,
+  2: #0033FF,
+  3: #00FF44,
+  4: #FF4E00,
+  5: #8000FF
+);
+
+@function cycle($map, $index) {
+  $size: list.length(map.keys($map));
+  $key: (($index - 1) % $size) + 1;
+  @return map.get($map, $key);
+}
+
+@for $i from 1 through 100 {
+  .box#{$i} {
+    @include color_render(
+      cycle($dark-colors, $i),
+      cycle($light-colors, $i)
+    );
+  }
+}
+
+
+.box {
+  height: 100%;
+  width: 100%;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+
+  @media only screen and (max-width: 650px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  .bg {
+    padding: 2rem;
+    background-color: rgba($black, .2);
+    width: 55%;
+    transform: skewX(7deg);
+    position: absolute;
+    height: 100%;
+    left: -10%;
+    padding-left: 20rem;
+    transform-origin: 0 100%;
+
+    @media only screen and (max-width: 800px) {
+      width: 65%;
+    }
+
+    @media only screen and (max-width: 650px) {
+      width: 100%;
+      left: 0;
+      bottom: 0;
+      height: 54%;
+      transform: skewX(0deg);
+    }
+
+    &::before {
+      content: "";
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background-color: inherit;
+      pointer-events: none;
+      transform: skewX(10deg);
+
+      @media only screen and (max-width: 650px) {
+        width: 120%;
+        bottom: 0;
+        transform: skewX(0deg);
+      }
+
+    }
+  }
+
+  .details {
+    padding: 5rem;
+    padding-left: 10rem;
+    z-index: 100;
+    grid-column: 1 / span 1;
+    grid-row: 1 / -1;
+
+    @media only screen and (max-width: 650px) {
+      grid-row: 2 / span 1;
+      grid-column: 1 / -1;
+      text-align: center;
+      padding:2rem;
+      transform: translateY(-9rem);
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 500;
+      margin-bottom: .5rem;
+      color: $white;
+    }
+
+    p {
+      display: inline-block;
+      font-size: 1.3rem;
+      color: $grey;
+      margin-bottom: 2rem;
+      margin-right: 5rem;
+
+      @media only screen and (max-width: 800px) {
+        margin-right: 0;
+      }
+    }
+
+    button {
+      padding: 1rem 3rem;
+      color: $white;
+      border-radius: 2rem;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      transition: all .3s ease;
+
+      &:hover {opacity: .8;}
+
+      &:focus {
+        outline: none;
+        border: none;
+      }
+    }
+  }
+
+  .illustration {
+    grid-column: 2 / -1;
+    grid-row: 1 / -1;
+    justify-self: center;
+
+    @media only screen and (max-width: 650px) {
+      grid-row: 1 / span 1;
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    div {
+      height: 25rem;
+      width: 18rem;
+      border-radius: 3rem;
+      background-color: $b1cl;
+      position: relative;
+      transform: skewX(-10deg);
+
+      @media only screen and (max-width: 800px) {
+        height: 20rem;
+        width: 15rem;
+      }
+
+      &::after,
+      &::before {
+        content: "";
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        border-radius: 3rem;
+        top: 0;
+        left: 0;
+      }
+
+      &::after {transform: translate(4rem, -1rem);}
+      &::before {transform: translate(2rem, -2rem);}
+    }
+  }
+}
+
+.active {
+  opacity: 1 !important;
+}
