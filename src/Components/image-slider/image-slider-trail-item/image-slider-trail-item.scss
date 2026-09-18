@@ -1,0 +1,11 @@
+.trail-item {
+  padding-top: 1rem;
+  border-top: 3px solid #fff;
+  cursor: pointer;
+  opacity: .3;
+  transition: opacity .3s ease;
+}
+
+.trail-item.active {
+  opacity: 1;
+}

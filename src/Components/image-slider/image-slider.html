@@ -1,0 +1,24 @@
+<div class="container">
+  <div #slider class="slider">
+    @for (box of boxes; track box.boxId){
+      <app-image-slider-box [boxId]="box.boxId"
+                            [header]="box.header"
+                            [description]="box.description"
+                            [buttonText]="box.buttonText"
+      />
+    }
+  </div>
+
+  <svg xmlns="http://www.w3.org/2000/svg" class="prev" width="56.898" height="91" viewBox="0 0 56.898 91"><path d="M45.5,0,91,56.9,48.452,24.068,0,56.9Z" transform="translate(0 91) rotate(-90)" fill="#fff"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" class="next" width="56.898" height="91" viewBox="0 0 56.898 91"><path d="M45.5,0,91,56.9,48.452,24.068,0,56.9Z" transform="translate(56.898) rotate(90)" fill="#fff"/></svg>
+  <div class="trail">
+    @for (box of boxes; track box.boxId){
+      <app-image-slider-trail-item
+        #trailItem
+        [boxId]="box.boxId"
+        [isActive]="box.boxId === this.activeBoxId()"
+        (trailMustUpdate)="updateActiveBox($event)"
+      />
+    }
+  </div>
+</div>

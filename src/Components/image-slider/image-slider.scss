@@ -1,0 +1,135 @@
+// Colors
+$b1cd: #500033;
+$b1cl: #FF0077;
+$b2cd: #000050;
+$b2cl: #0033FF;
+$b3cd: #00501D;
+$b3cl: #00FF44;
+$b4cd: #554D00;
+$b4cl: #FF4E00;
+$b5cd: #300050;
+$b5cl: #8000FF;
+$black: #000;
+$white: #fff;
+$grey: #B5B4B4;
+
+:host {
+  --dark: #000;
+  --light: #fff;
+}
+.box {
+  background-color: var(--dark);
+
+  .illustration .inner {
+    background-color: var(--light);
+  }
+}
+////////// Mixin
+// Generate different colors for slides
+@mixin color_render($DC, $LC) {
+  background-color: $DC;
+  .illustration .inner {
+    background-color: $LC;
+    &::after, &::before{ background-color: rgba($LC, .4);}
+  }
+  button {background-color: $LC;}
+}
+
+*,
+*:before,
+*:after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+
+.container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 5rem;
+
+  @media only screen and (max-width: 1000px) {
+    border-radius: 0;
+  }
+}
+
+.slider {
+  display: flex;
+  width: auto;
+  height: 55rem;
+  transition: all .25s ease-in;
+  // overflow-x: auto;
+  // scroll-snap-type: x mandatory;
+  // -webkit-overflow-scrolling: touch;
+  // scroll-behavior: smooth;
+  transform: translateX(0);
+
+  @media only screen and (max-width: 1000px) {
+    height: 100vh;
+  }
+}
+.prev,
+.next,
+.trail {
+  z-index: 10000;
+  position: absolute;
+}
+
+.prev,
+.next {
+  width: 4rem;
+  cursor: pointer;
+  opacity: .2;
+  transition: all .3s ease;
+
+  @media only screen and (max-width: 650px) {
+    display: none;
+  }
+
+  &:hover { opacity: 1;}
+}
+.prev {
+  top: 50%;
+  left: 2%;
+  transform: translateY(-50%);
+}
+
+.next {
+  top: 50%;
+  right: 2%;
+  transform: translateY(-50%);
+}
+
+.trail {
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  max-width: 90%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr));
+  gap: 1rem;
+  text-align: center;
+  font-size: 1.5rem;
+  color: $white;
+
+  @media only screen and (max-width: 650px) {
+    width: 90%;
+    bottom: 13%;
+  }
+
+  .trail div {
+    padding: 2rem;
+    border-top: 3px solid #fff;
+    cursor: pointer;
+    opacity: .3;
+    transition: all 0.3s ease;
+
+    &:hover {opacity: .6;}
+
+    @media only screen and (max-width: 650px) {
+      padding: 1rem;
+    }
+  }
+}
